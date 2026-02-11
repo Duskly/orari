@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A che ora esco?</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23ef4444%22/><text y=%22.9em%22 x=%2250%%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22 font-weight=%22bold%22>?</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ef4444%22/><text y=%22.9em%22 x=%2250%%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22 font-weight=%22bold%22>?</text></svg>">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at top left, #1E293B, #0F172A, #0B1220);
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary-gradient: linear-gradient(135deg, #2563EB, #7C3AED);
+            --secondary-gradient: linear-gradient(135deg, #6366F1, #3B82F6);
+            --text-main: #F8FAFC;
+            --text-label: #94A3B8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start; /* Allinea in alto invece che al centro */
+            justify-content: center;
+            padding: 15px 10px; /* Ridotto padding superiore del body */
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .glow-bg {
+            position: absolute;
+            top: 0;
+            width: 250px;
+            height: 250px;
+            background: #3B82F6;
+            filter: blur(100px);
+            border-radius: 50%;
+            opacity: 0.12;
+            z-index: -1;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px 18px; /* Più compatto */
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+            margin-top: 5px; /* Spostata più su */
+        }
+
+        .btn-reset {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn-reset svg { fill: var(--text-label); width: 16px; height: 16px; }
+
+        h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 26px; /* Leggermente più piccolo */
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 18px; /* Meno spazio sotto il titolo */
+            text-align: center;
+            background: linear-gradient(to bottom, #fff, #CBD5E1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .group { margin-bottom: 12px; } /* Campi più vicini tra loro */
+
+        label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-label);
+            margin-bottom: 4px;
+        }
+
+        .input-wrapper { display: flex; gap: 8px; }
+
+        input[type="time"] {
+            flex: 1;
+            height: 48px; /* Più basso */
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 0 10px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .btn-ora {
+            height: 48px;
+            width: 60px;
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .btn-main {
+            width: 100%;
+            height: 56px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        #risultato-container {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        #risultato-container.success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        #ora-finale { font-size: 24px; font-weight: 800; color: #fff; display: block; }
+        #risultato-container.success #ora-finale { color: #34D399; }
+        .sub-info { display: block; font-size: 11px; color: var(--text-label); margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="glow-bg"></div>
+
+<div class="card">
+    <button class="btn-reset" onclick="resetAll()">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+
+    <h1>A che ora esco?</h1>
+    
+    <div class="group">
+        <label>Ingresso</label>
+        <div class="input-wrapper">
+            <input type="time" id="ingresso" value="09:00">
+            <button class="btn-ora" onclick="setOra('ingresso')">ORA</button>
+        </div>
+    </div>
+
+    <div class="group">
+        <label>Uscita Pausa</label>
+        <div class="input-wrapper">
+            <input type="time" id="uscitaPausa">
+            <button class="btn-ora" onclick="setOra('uscitaPausa')">ORA</button>
+        </div>
+    </div>
+
+    <div class="group">
+        <label>Rientro Pausa</label>
+        <div class="input-wrapper">
+            <input type="time" id="rientroPausa">
+            <button class="btn-ora" onclick="setOra('rientroPausa')">ORA</button>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="calcolaUscita()">Calcola Orario</button>
+
+    <div id="risultato-container">
+        <span id="ora-finale">-- : --</span>
+        <span id="sub-info" class="sub-info">Pronto</span>
+    </div>
+</div>
+
+<script>
+    function setOra(id) {
+        const adesso = new Date();
+        const ora = adesso.getHours().toString().padStart(2, '0');
+        const minuti = adesso.getMinutes().toString().padStart(2, '0');
+        document.getElementById(id).value = `${ora}:${minuti}`;
+    }
+
+    function resetAll() {
+        document.getElementById('ingresso').value = '09:00';
+        document.getElementById('uscitaPausa').value = '';
+        document.getElementById('rientroPausa').value = '';
+        document.getElementById('ora-finale').innerText = '-- : --';
+        document.getElementById('sub-info').innerText = 'Dati resettati';
+        document.getElementById('risultato-container').classList.remove('success');
+    }
+
+    function calcolaUscita() {
+        const ingresso = document.getElementById('ingresso').value;
+        const uscitaP = document.getElementById('uscitaPausa').value;
+        const rientroP = document.getElementById('rientroPausa').value;
+
+        if (!ingresso) return;
+
+        const toMin = (t) => {
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        };
+
+        const minIngresso = toMin(ingresso);
+        const lavoroNetto = 432; 
+        let pausaDaApplicare = 30;
+
+        if (uscitaP && rientroP) {
+            const minUscitaP = toMin(uscitaP);
+            const minRientroP = toMin(rientroP);
+            const durataPausaEffettiva = minRientroP - minUscitaP;
+            pausaDaApplicare = Math.max(30, durataPausaEffettiva);
+        }
+
+        const minUscitaFinale = minIngresso + lavoroNetto + pausaDaApplicare;
+        const oreF = Math.floor(minUscitaFinale / 60) % 24;
+        const minF = minUscitaFinale % 60;
+        const orarioFormattato = `${oreF.toString().padStart(2, '0')}:${minF.toString().padStart(2, '0')}`;
+
+        document.getElementById('ora-finale').innerText = orarioFormattato;
+        document.getElementById('sub-info').innerText = `Pausa: ${pausaDaApplicare} min`;
+        document.getElementById('risultato-container').classList.add('success');
+    }
+</script>
+
+</body>
+</html>
